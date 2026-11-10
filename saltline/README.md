@@ -52,6 +52,8 @@ with the squad's progress.
   breaking silently.
 - `client/mp.js` and `client/mp.css` are the lobby, HUD and sync.
 - `client/avatar.js` is the teammate character model (below).
+- `rooms.js` holds the transport-independent room logic. `server.js` handles HTTP, the
+  WebSocket, per-socket rate limiting, message size limits and heartbeats.
 
 ## Teammate model
 
@@ -73,5 +75,3 @@ the game, so nothing is downloaded.
 - **Legs and body:** two-bone IK plants the feet, with a cadence and stride that match
   ground speed. The legs tuck in the air, and a downed teammate lies propped on the pack.
 - **Cost:** about 24 draw calls and 24k vertices per teammate.
-- `rooms.js` holds the transport-independent room logic. `server.js` handles HTTP, the
-  WebSocket, per-socket rate limiting, message size limits and heartbeats.
