@@ -1,0 +1,737 @@
+:root {
+  --bg: #0a1018;
+  --panel: rgba(11, 17, 25, 0.88);
+  --line: rgba(130, 170, 200, 0.26);
+  --cyan: #4fd8ff;
+  --warm: #ff9a4a;
+  --danger: #ff5a3c;
+  --text: #e8eef4;
+  --dim: #a3b4c3;
+  --hud-scale: 1;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game,
+#view,
+#ui {
+  position: absolute;
+  inset: 0;
+}
+
+#view canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The interface never blocks the canvas except where a screen is showing. */
+#ui {
+  pointer-events: none;
+  /* Scales with the frame height so text stays legible from 462 px embeds to 1080p fullscreen. */
+  font-size: clamp(12px, 2.25vh, 18px);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- screens ---------- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1em;
+  pointer-events: auto;
+  background: radial-gradient(ellipse at 50% 40%, rgba(10, 16, 24, 0.5), rgba(6, 10, 15, 0.9));
+}
+
+.screen.loading,
+.screen.error,
+.screen.unsupported {
+  background: var(--bg);
+}
+
+.panel {
+  width: min(34em, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 1.5em 1.75em;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--cyan);
+  box-shadow: 0 1.5em 4em rgba(0, 0, 0, 0.55);
+}
+
+.screen.settings .panel,
+.screen.log .panel {
+  width: min(42em, 100%);
+}
+
+.logo {
+  margin: 0 0 0.2em;
+  font-size: 2.5em;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  line-height: 1;
+}
+
+.logo span {
+  display: block;
+  margin-top: 0.35em;
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0.62em;
+  color: var(--warm);
+}
+
+h2 {
+  margin: 0 0 0.6em;
+  font-size: 1.5em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin: 1.3em 0 0.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+p {
+  margin: 0.5em 0;
+  line-height: 1.45;
+}
+
+.tagline {
+  margin: 0.9em 0 1.2em;
+  color: var(--dim);
+}
+
+.build,
+.dim {
+  color: var(--dim);
+  font-size: 0.8em;
+}
+
+.notice {
+  padding: 0.5em 0.7em;
+  border-left: 3px solid var(--warm);
+  background: rgba(255, 154, 74, 0.09);
+  font-size: 0.85em;
+}
+
+.notice:empty {
+  display: none;
+}
+
+.detail {
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+nav {
+  display: grid;
+  gap: 0.5em;
+  margin: 1em 0;
+}
+
+.row-nav {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 1.2em;
+}
+
+button {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.7em 1em;
+  border: 1px solid var(--line);
+  background: rgba(130, 170, 200, 0.07);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+button small {
+  color: var(--dim);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+button:hover {
+  background: rgba(79, 216, 255, 0.14);
+  border-color: var(--cyan);
+}
+
+button.primary {
+  border-color: var(--cyan);
+  background: rgba(79, 216, 255, 0.16);
+}
+
+/* Keyboard focus is always visible, on every control. */
+:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  margin: 0 0.15em;
+  padding: 0.1em 0.45em;
+  border: 1px solid rgba(230, 240, 250, 0.5);
+  border-bottom-width: 2px;
+  border-radius: 0.25em;
+  background: rgba(8, 12, 18, 0.75);
+  font: 600 0.9em ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  text-align: center;
+}
+
+.controls-strip {
+  color: var(--dim);
+  font-size: 0.8em;
+  line-height: 2.1;
+}
+
+.progress {
+  height: 0.5em;
+  margin: 1.6em 0 0.7em;
+  border: 1px solid var(--line);
+}
+
+.progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--cyan);
+  transition: width 0.15s linear;
+}
+
+.status {
+  min-height: 1.5em;
+  color: var(--dim);
+  font-size: 0.85em;
+  letter-spacing: 0.06em;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35em 2em;
+  margin: 1em 0;
+  padding: 0.8em 0;
+  border-block: 1px solid var(--line);
+}
+
+.stats dt {
+  color: var(--dim);
+}
+
+.stats dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 12.5em 1fr 3.6em;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.28em 0;
+}
+
+.row label,
+.row .label {
+  color: var(--text);
+}
+
+.row output {
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--cyan);
+}
+
+input[type='checkbox'] {
+  width: 1.25em;
+  height: 1.25em;
+  accent-color: var(--cyan);
+  justify-self: start;
+}
+
+select {
+  padding: 0.35em 0.5em;
+  border: 1px solid var(--line);
+  background: #101822;
+  color: var(--text);
+  font: inherit;
+}
+
+.bind {
+  justify-content: center;
+  padding: 0.35em 0.8em;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.bind.waiting {
+  border-color: var(--warm);
+  color: var(--warm);
+}
+
+.log-body p b,
+.subtitles p b {
+  margin-right: 0.6em;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- HUD ---------- */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  font-size: calc(1em * var(--hud-scale));
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(190, 40, 20, 0.6) 100%);
+}
+
+.vignette.low {
+  opacity: 0.55;
+}
+
+.vignette.hurt {
+  animation: hurt 0.5s ease-out;
+}
+
+@keyframes hurt {
+  from {
+    opacity: 0.95;
+  }
+}
+
+.crosshair,
+.hitmarker,
+.damage-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.crosshair {
+  --gap: 6px;
+}
+
+.crosshair i {
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.75);
+}
+
+.crosshair .dot {
+  width: 2px;
+  height: 2px;
+  margin: -1px;
+}
+
+.crosshair .t,
+.crosshair .b {
+  width: 2px;
+  height: 8px;
+  margin-left: -1px;
+}
+
+.crosshair .l,
+.crosshair .r {
+  width: 8px;
+  height: 2px;
+  margin-top: -1px;
+}
+
+.crosshair .t {
+  bottom: var(--gap);
+}
+
+.crosshair .b {
+  top: var(--gap);
+}
+
+.crosshair .l {
+  right: var(--gap);
+}
+
+.crosshair .r {
+  left: var(--gap);
+}
+
+/* Hit: a thin X. Critical: a larger, thicker X. Kill: the X inside a ring. */
+.hitmarker {
+  opacity: 0;
+}
+
+.hitmarker.on {
+  opacity: 1;
+}
+
+.hitmarker .x::before,
+.hitmarker .x::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: -1px;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+  /* The centre is left open so the marker never hides the target. */
+  clip-path: polygon(0 0, 32% 0, 32% 100%, 68% 100%, 68% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.hitmarker .x::before {
+  transform: rotate(45deg);
+}
+
+.hitmarker .x::after {
+  transform: rotate(-45deg);
+}
+
+.hitmarker.crit .x::before,
+.hitmarker.crit .x::after,
+.hitmarker.kill .x::before,
+.hitmarker.kill .x::after {
+  left: -15px;
+  top: -2px;
+  width: 30px;
+  height: 4px;
+  background: var(--warm);
+}
+
+.hitmarker .ring {
+  display: none;
+  position: absolute;
+  left: -19px;
+  top: -19px;
+  width: 38px;
+  height: 38px;
+  border: 3px solid var(--warm);
+  border-radius: 50%;
+}
+
+.hitmarker.kill .ring {
+  display: block;
+}
+
+.damage-ring i {
+  position: absolute;
+  left: -7em;
+  top: -7em;
+  width: 14em;
+  height: 14em;
+  border-radius: 50%;
+  border: 0.55em solid transparent;
+  border-top-color: var(--danger);
+  /* Only a short arc at the top of the ring is drawn; rotation points it at the attacker. */
+  clip-path: polygon(30% 0, 70% 0, 50% 50%);
+  animation: fade 1s ease-out forwards;
+}
+
+@keyframes fade {
+  to {
+    opacity: 0;
+  }
+}
+
+.objective {
+  position: absolute;
+  left: 1.4em;
+  top: 1.2em;
+  max-width: 24em;
+  padding: 0.5em 0.9em;
+  border-left: 3px solid var(--cyan);
+  background: rgba(8, 13, 20, 0.6);
+}
+
+.objective.flash {
+  animation: flash 1.2s ease-out;
+}
+
+@keyframes flash {
+  from {
+    background: rgba(79, 216, 255, 0.55);
+  }
+}
+
+.objective .tag {
+  display: block;
+  color: var(--cyan);
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.objective .text {
+  font-weight: 600;
+}
+
+.objective .count {
+  margin-left: 0.6em;
+  color: var(--warm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+.marker .diamond {
+  position: absolute;
+  left: -0.5em;
+  top: -0.5em;
+  width: 1em;
+  height: 1em;
+  border: 2px solid var(--cyan);
+  background: rgba(79, 216, 255, 0.25);
+  transform: rotate(45deg);
+}
+
+.marker span {
+  position: absolute;
+  top: 0.9em;
+  transform: translateX(-50%);
+  font-size: 0.75em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.hint,
+.prompt,
+.subtitles {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.hint {
+  top: 16%;
+  padding: 0.5em 1em;
+  border: 1px solid var(--line);
+  background: rgba(8, 13, 20, 0.72);
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.hint.on {
+  opacity: 1;
+}
+
+.prompt {
+  top: 60%;
+  padding: 0.45em 1em 0.6em;
+  background: rgba(8, 13, 20, 0.72);
+  white-space: nowrap;
+}
+
+.prompt .bar,
+.vitals .bar {
+  height: 0.3em;
+  margin-top: 0.45em;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.prompt .bar i,
+.vitals .bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--cyan);
+}
+
+.subtitles {
+  bottom: 17%;
+  width: min(44em, 86%);
+}
+
+.subtitles p {
+  display: inline-block;
+  margin: 0;
+  padding: 0.4em 0.9em;
+  background: rgba(4, 7, 11, 0.8);
+  font-size: 1.05em;
+  line-height: 1.4;
+  text-shadow: none;
+}
+
+.vitals {
+  position: absolute;
+  left: 1.4em;
+  bottom: 1.3em;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+/* A plus sign drawn from two bars, so health is identified by shape. */
+.cross-icon {
+  position: relative;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.cross-icon::before,
+.cross-icon::after {
+  content: '';
+  position: absolute;
+  background: var(--text);
+}
+
+.cross-icon::before {
+  left: 38%;
+  top: 0;
+  width: 24%;
+  height: 100%;
+}
+
+.cross-icon::after {
+  left: 0;
+  top: 38%;
+  width: 100%;
+  height: 24%;
+}
+
+.vitals .bar {
+  width: 9em;
+  height: 0.5em;
+  margin: 0;
+}
+
+.vitals .bar i {
+  background: var(--text);
+}
+
+.vitals .num {
+  min-width: 2em;
+  font-size: 1.5em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.vitals.low .bar i,
+.vitals.low .cross-icon::before,
+.vitals.low .cross-icon::after {
+  background: var(--danger);
+}
+
+.vitals.low .num {
+  color: var(--danger);
+}
+
+.weapon {
+  position: absolute;
+  right: 1.4em;
+  bottom: 1.3em;
+  display: grid;
+  justify-items: end;
+  gap: 0.1em;
+}
+
+.weapon .name {
+  color: var(--dim);
+  font-size: 0.72em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.weapon .ammo b {
+  font-size: 2.1em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.weapon .ammo b.empty {
+  color: var(--danger);
+}
+
+.weapon .ammo small {
+  color: var(--dim);
+  font-size: 1em;
+}
+
+.weapon .state {
+  min-height: 1.2em;
+  color: var(--warm);
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.perf {
+  position: absolute;
+  right: 1.4em;
+  top: 1.2em;
+  padding: 0.3em 0.6em;
+  background: rgba(4, 7, 11, 0.75);
+  font: 0.72em ui-monospace, Menlo, Consolas, monospace;
+  text-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vignette.hurt,
+  .objective.flash {
+    animation: none;
+  }
+}
