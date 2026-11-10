@@ -50,8 +50,8 @@ test('serves the patched game and client assets', async (t) => {
   const html = await (await fetch(`http://127.0.0.1:${port}/`)).text();
   assert.match(html, /i\.mp_hooks=\{SL,SLV,run:c,game:_,cut:me,extract:ee/);
   assert.equal(html.match(/data-act="mp"/g).length, 2);
-  assert.match(html, /<script src="mp\.js"><\/script>\s*$/);
-  for (const f of ['mp.js', 'mp.css']) assert.equal((await fetch(`http://127.0.0.1:${port}/${f}`)).status, 200);
+  assert.match(html, /<script src="avatar\.js"><\/script>\s*<script src="mp\.js"><\/script>\s*$/);
+  for (const f of ['avatar.js', 'mp.js', 'mp.css']) assert.equal((await fetch(`http://127.0.0.1:${port}/${f}`)).status, 200);
   const health = await (await fetch(`http://127.0.0.1:${port}/healthz`)).json();
   assert.equal(health.ok, true);
   assert.equal((await fetch(`http://127.0.0.1:${port}/nope`)).status, 404);
@@ -95,9 +95,11 @@ test('rooms: create, list, join, ready, deploy, sync and leave', async (t) => {
   const runId = start.run.id;
 
   // State snapshots go to the other players only, clamped to sane ranges.
-  b.send({ t: 'st', run: runId, lv: 12, gs: 'playing', p: [1, 2, 99999], y: 0.5, pi: 0, hp: 80, mhp: 100, al: true, cr: false });
+  b.send({ t: 'st', run: runId, lv: 12, gs: 'playing', p: [1, 2, 99999], y: 0.5, pi: 0, hp: 80, mhp: 100, al: true, cr: false, v: [3.8, -99], ad: 0.5, sp: true, og: false });
   const st = await a.next((m) => m.t === 'st');
   assert.deepEqual(st.p, [1, 2, 10000]);
+  assert.deepEqual(st.v, [3.8, -30]);
+  assert.deepEqual([st.ad, st.sp, st.og], [0.5, true, false]);
   assert.equal(st.id, b.id);
   b.send({ t: 'fire', o: [0, 1, 0], d: [0, 0, -1] });
   assert.equal((await a.next((m) => m.t === 'fire')).id, b.id);

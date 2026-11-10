@@ -273,51 +273,36 @@
       mhp: Math.round(p.maxHealth || 100),
       al: p.alive !== false,
       cr: !!p.crouching,
+      v: [r2(p.vel ? p.vel.x : 0), r2(p.vel ? p.vel.z : 0)],
+      ad: r2(p.ads || 0),
+      sp: !!p.sprinting,
+      og: p.onGround !== false,
     });
   }
 
   // ---------------------------------------------------------------- avatars
 
-  let shared = null;
-  function sharedAssets() {
-    if (shared) return shared;
+  let tracerKit = null;
+  function tracerAssets() {
+    if (tracerKit) return tracerKit;
     const T = G.THREE;
-    shared = {
-      torso: new T.CapsuleGeometry(0.27, 0.55, 4, 10),
-      head: new T.SphereGeometry(0.19, 14, 10),
-      visor: new T.BoxGeometry(0.3, 0.09, 0.12),
-      leg: new T.BoxGeometry(0.16, 0.8, 0.18),
-      gun: new T.BoxGeometry(0.08, 0.1, 0.7),
-      band: new T.CylinderGeometry(0.285, 0.285, 0.07, 14, 1, true),
-      tracer: new T.BoxGeometry(0.025, 0.025, 1).translate(0, 0, -0.5),
-      dark: new T.MeshStandardMaterial({ color: 0x1d2226, roughness: 0.55, metalness: 0.35 }),
-      visorMat: new T.MeshBasicMaterial({ color: 0xffc977, toneMapped: false }),
-      bandMat: new T.MeshBasicMaterial({ color: 0xe8e4da, toneMapped: false, side: T.DoubleSide }),
-      tracerMat: new T.MeshBasicMaterial({ color: 0xffd08a, transparent: true, opacity: 0.9, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }),
+    tracerKit = {
+      // Extends along +Z: Object3D.lookAt points a mesh's +Z at the target.
+      geo: new T.BoxGeometry(0.018, 0.018, 1).translate(0, 0, 0.5),
+      mat: new T.MeshBasicMaterial({ color: 0xffd08a, transparent: true, opacity: 0.9, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }),
     };
-    return shared;
+    return tracerKit;
+  }
+
+  function buildModel(peer) {
+    const model = window.SaltlineAvatar.create(G.THREE, { seed: peer.id, team: COLORS[peer.color % COLORS.length], name: 'mp-peer-' + peer.id });
+    model.root.visible = false;
+    G.scene.add(model.root);
+    return model;
   }
 
   function makeAvatar(peer) {
-    const T = G.THREE;
-    const A = sharedAssets();
-    const color = COLORS[peer.color % COLORS.length];
-    const suit = new T.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, emissive: color, emissiveIntensity: 0.35 });
-    const root = new T.Group();
-    root.name = 'mp-peer-' + peer.id;
-    const body = new T.Group();
-    root.add(body);
-    const mesh = (g, m, x, y, z) => { const o = new T.Mesh(g, m); o.position.set(x, y, z); o.castShadow = true; body.add(o); return o; };
-    mesh(A.torso, suit, 0, 1.22, 0);
-    mesh(A.band, A.bandMat, 0, 1.3, 0);
-    mesh(A.band, A.bandMat, 0, 1.06, 0);
-    const head = mesh(A.head, A.dark, 0, 1.72, 0);
-    const visor = new T.Mesh(A.visor, A.visorMat);
-    visor.position.set(0, 0.02, -0.14);
-    head.add(visor);
-    const legL = mesh(A.leg, A.dark, -0.12, 0.42, 0);
-    const legR = mesh(A.leg, A.dark, 0.12, 0.42, 0);
-    const gun = mesh(A.gun, A.dark, 0.2, 1.3, -0.35);
+    const model = buildModel(peer);
 
     // Name tags are DOM labels projected each frame: the game's render pipeline
     // does not draw three.js sprites, and DOM text stays crisp at any resolution.
@@ -329,9 +314,18 @@
     tag.append(tagName, tagBar);
     tags().appendChild(tag);
 
-    root.visible = false;
-    G.scene.add(root);
-    return { root, body, head, legL, legR, gun, suit, tag, tagName, tagHp, label: '', walk: 0, init: false };
+    return { model, root: model.root, tag, tagName, tagHp, label: '', init: false };
+  }
+
+  function rebuildModel(peer) {
+    const a = peer.avatar;
+    const pos = a.root.position.clone(), yaw = a.root.rotation.y, vis = a.root.visible;
+    a.model.dispose();
+    a.model = buildModel(peer);
+    a.root = a.model.root;
+    a.root.position.copy(pos);
+    a.root.rotation.y = yaw;
+    a.root.visible = vis;
   }
 
   let tagLayer = null;
@@ -359,9 +353,7 @@
       a.tag.classList.toggle('low', hp <= 0.3);
     }
     const v = (tagPoint.v = tagPoint.v || new G.THREE.Vector3());
-    v.copy(a.root.position);
-    v.y += peer.alive ? (peer.crouch ? 1.75 : 2.2) : 0.9;
-    v.project(G.camera);
+    a.model.tagAnchor(v).project(G.camera);
     if (v.z > 1 || Math.abs(v.x) > 1.1 || Math.abs(v.y) > 1.1) { a.tag.style.display = 'none'; return; }
     const r = (G.renderer.domElement || document.body).getBoundingClientRect();
     const dist = G.camera.position.distanceTo(a.root.position);
@@ -371,8 +363,7 @@
   }
 
   function disposeAvatar(a) {
-    G.scene.remove(a.root);
-    a.suit.dispose();
+    a.model.dispose();
     a.tag.remove();
   }
 
@@ -388,15 +379,14 @@
       ids.add(p.id);
       let peer = S.peers.get(p.id);
       if (!peer) {
-        peer = { id: p.id, name: p.name, color: p.color, hp: 100, mhp: 100, alive: true, gs: 'title', run: 0, lv: 0, pos: new G.THREE.Vector3(), yaw: 0, crouch: false, seen: 0 };
+        peer = { id: p.id, name: p.name, color: p.color, hp: 100, mhp: 100, alive: true, gs: 'title', run: 0, lv: 0, pos: new G.THREE.Vector3(), yaw: 0, pitch: 0, vx: 0, vz: 0, ads: 0, sprint: false, onGround: true, crouch: false, seen: 0 };
         peer.avatar = makeAvatar(peer);
         S.peers.set(p.id, peer);
       }
       peer.name = p.name;
       if (peer.color !== p.color) {
         peer.color = p.color;
-        peer.avatar.suit.color.setHex(COLORS[p.color % COLORS.length]);
-        peer.avatar.suit.emissive.setHex(COLORS[p.color % COLORS.length]);
+        rebuildModel(peer);
         peer.avatar.label = '';
       }
     }
@@ -422,6 +412,12 @@
     const was = peer.gs + peer.alive + peer.hp;
     peer.pos.set(m.p[0], m.p[1], m.p[2]);
     peer.yaw = m.y;
+    peer.pitch = m.pi || 0;
+    peer.vx = m.v ? m.v[0] : 0;
+    peer.vz = m.v ? m.v[1] : 0;
+    peer.ads = m.ad || 0;
+    peer.sprint = !!m.sp;
+    peer.onGround = m.og !== false;
     peer.hp = m.hp;
     peer.mhp = m.mhp;
     peer.alive = m.al;
@@ -443,7 +439,7 @@
     const peer = S.peers.get(m.id);
     if (!peer || !peerVisible(peer)) return;
     const T = G.THREE;
-    const A = sharedAssets();
+    const A = tracerAssets();
     const o = new T.Vector3(m.o[0], m.o[1], m.o[2]);
     const d = new T.Vector3(m.d[0], m.d[1], m.d[2]).normalize();
     let len = 120;
@@ -451,14 +447,17 @@
       const hit = G.physics && G.physics.raycast && G.physics.raycast(o, d, 120);
       if (hit && hit.dist > 0) len = hit.dist;
     } catch {}
-    const mesh = new T.Mesh(A.tracer, A.tracerMat);
-    mesh.position.copy(o);
-    mesh.lookAt(o.clone().add(d));
-    mesh.scale.set(1, 1, len);
+    // The shot is aimed from the shooter's camera; draw it from the avatar's muzzle to the same impact point.
+    const end = o.clone().addScaledVector(d, len);
+    const start = peer.avatar.root.visible ? peer.avatar.model.muzzleWorld(new T.Vector3()) : o;
+    const mesh = new T.Mesh(A.geo, A.mat);
+    mesh.position.copy(start);
+    mesh.lookAt(end);
+    mesh.scale.set(1, 1, Math.max(0.1, start.distanceTo(end)));
     mesh.renderOrder = 10;
     G.scene.add(mesh);
     tracers.push({ mesh, life: 0.07 });
-    peer.avatar.flash = 0.08;
+    peer.avatar.model.fire();
   }
 
   function angleLerp(a, b, t) {
@@ -466,31 +465,27 @@
     return a + d * t;
   }
 
+  let targetPos = null;
   function updateAvatars(dt) {
     const k = 1 - Math.exp(-14 * dt);
     const st = H.game.state;
     const showTags = st === 'playing' || st === 'dead';
+    const now = performance.now();
+    targetPos = targetPos || new G.THREE.Vector3();
     for (const peer of S.peers.values()) {
       const a = peer.avatar;
       const vis = peerVisible(peer);
       a.root.visible = vis;
       if (!vis) { a.init = false; placeTag(peer, false); continue; }
-      const prev = a.root.position.clone();
-      if (!a.init || prev.distanceTo(peer.pos) > 8) { a.root.position.copy(peer.pos); a.root.rotation.y = peer.yaw; a.init = true; }
+      // Dead-reckon from the last snapshot so movement stays smooth between 15 Hz updates.
+      const ahead = Math.min(0.15, (now - peer.seen) / 1000);
+      targetPos.set(peer.pos.x + peer.vx * ahead, peer.pos.y, peer.pos.z + peer.vz * ahead);
+      if (!a.init || a.root.position.distanceTo(targetPos) > 8) { a.root.position.copy(targetPos); a.root.rotation.y = peer.yaw; a.init = true; }
       else {
-        a.root.position.lerp(peer.pos, k);
+        a.root.position.lerp(targetPos, k);
         a.root.rotation.y = angleLerp(a.root.rotation.y, peer.yaw, k);
       }
-      const speed = Math.hypot(a.root.position.x - prev.x, a.root.position.z - prev.z) / Math.max(dt, 1e-3);
-      a.walk += Math.min(speed, 8) * dt * 2.4;
-      const swing = Math.sin(a.walk) * Math.min(1, speed / 3) * 0.55;
-      a.legL.rotation.x = swing;
-      a.legR.rotation.x = -swing;
-      a.body.scale.y = peer.crouch ? 0.72 : 1;
-      a.body.rotation.x = peer.alive ? 0 : -Math.PI / 2;
-      a.body.position.y = peer.alive ? 0 : 0.3;
-      a.flash = Math.max(0, (a.flash || 0) - dt);
-      a.gun.scale.z = a.flash > 0 ? 0.9 : 1;
+      a.model.update(dt, { vx: peer.vx, vz: peer.vz, pitch: peer.pitch, crouch: peer.crouch, sprint: peer.sprint, ads: peer.ads, alive: peer.alive, onGround: peer.onGround });
       placeTag(peer, showTags);
     }
     for (let i = tracers.length - 1; i >= 0; i--) {

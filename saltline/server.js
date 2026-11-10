@@ -24,6 +24,7 @@ function loadAssets() {
   return {
     '/': html,
     '/index.html': html,
+    '/avatar.js': asset(client('avatar.js'), 'text/javascript; charset=utf-8'),
     '/mp.js': asset(client('mp.js'), 'text/javascript; charset=utf-8'),
     '/mp.css': asset(client('mp.css'), 'text/css; charset=utf-8'),
   };

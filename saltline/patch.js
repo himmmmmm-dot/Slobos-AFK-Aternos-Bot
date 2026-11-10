@@ -25,7 +25,8 @@ const PATCHES = [
   },
 ];
 
-const ASSETS = '\n<link rel="stylesheet" href="mp.css">\n<script src="mp.js"></script>\n';
+const CLIENT_FILES = ['avatar.js', 'mp.js', 'mp.css'];
+const ASSETS = '\n<link rel="stylesheet" href="mp.css">\n<script src="avatar.js"></script>\n<script src="mp.js"></script>\n';
 
 function patchGame(html) {
   for (const p of PATCHES) {
@@ -40,7 +41,7 @@ function buildGame(source = SOURCE) {
   return patchGame(fs.readFileSync(source, 'utf8'));
 }
 
-module.exports = { patchGame, buildGame, PATCHES };
+module.exports = { patchGame, buildGame, PATCHES, CLIENT_FILES };
 
 // `node patch.js [outDir]` writes a static build (index.html + client assets),
 // for hosting the page separately and pointing it at a server with ?server=wss://…
@@ -48,6 +49,6 @@ if (require.main === module) {
   const out = path.resolve(process.argv[2] || path.join(__dirname, 'dist'));
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, 'index.html'), buildGame());
-  for (const f of ['mp.js', 'mp.css']) fs.copyFileSync(path.join(__dirname, 'client', f), path.join(out, f));
+  for (const f of CLIENT_FILES) fs.copyFileSync(path.join(__dirname, 'client', f), path.join(out, f));
   console.log(`[saltline] static build written to ${out}`);
 }

@@ -280,6 +280,10 @@ RoomManager.prototype.handlers = {
       mhp: int(msg.mhp, 1, 1000, 100),
       al: !!msg.al,
       cr: !!msg.cr,
+      v: Array.isArray(msg.v) && msg.v.length === 2 ? msg.v.map((v) => num(v, -30, 30)) : [0, 0],
+      ad: num(msg.ad, 0, 1),
+      sp: !!msg.sp,
+      og: msg.og !== false,
     }, client);
   },
 
