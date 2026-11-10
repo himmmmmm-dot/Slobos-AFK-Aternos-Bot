@@ -1,0 +1,31 @@
+{
+  "name": "afterlight-blackout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AFTERLIGHT: BLACKOUT — an original browser FPS (client). Milestone 1: foundation.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "package": "node scripts/package.mjs",
+    "smoke": "node scripts/smoke.mjs && node scripts/lock-probe.mjs"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.187.0",
+    "fflate": "^0.8.3",
+    "puppeteer-core": "^25.17.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
+  }
+}

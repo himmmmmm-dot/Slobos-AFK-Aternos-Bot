@@ -1,0 +1,276 @@
+{
+  "checks": [
+    {
+      "name": "reaches the main menu from a nested path (relative asset URLs)",
+      "ok": true,
+      "detail": "1604 ms"
+    },
+    {
+      "name": "SDK initialises in its local test environment",
+      "ok": true,
+      "detail": "local"
+    },
+    {
+      "name": "the SDK logs loading start then stop, once each",
+      "ok": true,
+      "detail": "loadingStart,loadingStop"
+    },
+    {
+      "name": "one click from the menu starts gameplay",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the SDK logs one gameplay start",
+      "ok": true,
+      "detail": "gameplayStart"
+    },
+    {
+      "name": "W walks the player forward",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the beam blocks a standing player",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "C crouches under the beam",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Space vaults the barricade",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "reaching the concourse completes the first objective",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "moving the mouse right turns the view right",
+      "ok": true,
+      "detail": "0.000 -> -0.134"
+    },
+    {
+      "name": "left mouse fires the pistol",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "R starts a reload",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "P pauses and the simulation stops",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "settings controls change the live settings",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a key can be rebound from the settings screen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Escape cancels a rebind and stays on the settings screen",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Resume returns to play",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the SDK logs stop on pause and start on resume",
+      "ok": true,
+      "detail": "gameplayStart,gameplayStop,gameplayStart"
+    },
+    {
+      "name": "no script errors during the first session",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "settings survive a reload",
+      "ok": true,
+      "detail": "store: crazygames-data"
+    },
+    {
+      "name": "with the SDK blocked the game still reaches the menu",
+      "ok": true,
+      "detail": "CrazyGames SDK unavailable: the SDK script could not be loaded (blocked, offline or filtered)"
+    },
+    {
+      "name": "the menu says platform services are unavailable",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the mission can be completed in the real build",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Replay starts a fresh run",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Retry after death returns to a live run",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Quit returns to the menu",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "six restarts do not grow GPU geometry or texture counts",
+      "ok": true,
+      "detail": "geometries 27->27, textures 8->8"
+    },
+    {
+      "name": "821x462: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 12.0 px "
+    },
+    {
+      "name": "907x510: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 12.0 px "
+    },
+    {
+      "name": "1077x606: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 13.6 px "
+    },
+    {
+      "name": "1216x684: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 15.4 px "
+    },
+    {
+      "name": "1366x768: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 17.3 px "
+    },
+    {
+      "name": "1920x1080: canvas fills the frame and the HUD stays on screen",
+      "ok": true,
+      "detail": "objective text 18.0 px "
+    },
+    {
+      "name": "no script errors in the second session",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a slow SDK only delays the menu",
+      "ok": true,
+      "detail": "4007 ms, status ready"
+    },
+    {
+      "name": "the platform mute setting silences the game",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "blocked storage falls back to memory and tells the player",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the game is still playable without storage",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a corrupt save is replaced with defaults and reported",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "perf": {
+    "coldStartToMenuMs": 1604,
+    "low": {
+      "fps": 4.218815912963575,
+      "avgMs": 237.03333367241754,
+      "p95Ms": 250,
+      "drawCalls": 118,
+      "triangles": 2694,
+      "geometries": 26,
+      "textures": 7,
+      "pixelRatio": 0.75,
+      "width": 1280,
+      "height": 720
+    },
+    "high": {
+      "fps": 4,
+      "avgMs": 250,
+      "p95Ms": 250,
+      "drawCalls": 149,
+      "triangles": 3480,
+      "geometries": 26,
+      "textures": 7,
+      "pixelRatio": 1,
+      "width": 1280,
+      "height": 720
+    },
+    "warmStartToMenuMs": 2079,
+    "medium": {
+      "fps": 4.770685966423768,
+      "avgMs": 209.6134616778447,
+      "p95Ms": 250,
+      "drawCalls": 154,
+      "triangles": 3656,
+      "geometries": 27,
+      "textures": 8,
+      "pixelRatio": 1,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "platform": {
+    "real": {
+      "id": "crazygames",
+      "status": "ready",
+      "environment": "local",
+      "reason": null,
+      "data": "crazygames-data",
+      "muteAudio": false
+    },
+    "storage": {
+      "kind": "crazygames-data",
+      "persistent": true
+    },
+    "blocked": {
+      "id": "crazygames",
+      "status": "unavailable",
+      "environment": "none",
+      "reason": "CrazyGames SDK unavailable: the SDK script could not be loaded (blocked, offline or filtered)",
+      "data": null,
+      "muteAudio": false
+    },
+    "slow": {
+      "id": "crazygames",
+      "status": "ready",
+      "environment": "local",
+      "reason": null,
+      "data": "crazygames-data",
+      "muteAudio": false
+    }
+  },
+  "notes": [],
+  "browser": "Chrome/157.0.8103.38"
+}

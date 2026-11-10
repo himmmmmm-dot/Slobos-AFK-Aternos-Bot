@@ -46,6 +46,11 @@ The `saltline/` folder is a separate project: online co-op rooms for the *Saltli
 
 ---
 
+## 🔦 AFTERLIGHT: BLACKOUT
+The `afterlight/` folder is a separate project: an original browser first-person shooter being built for CrazyGames. It is at Milestone 1 of 6 (one graybox encounter). See [afterlight/README.md](afterlight/README.md).
+
+---
+
 ## ❤️ Credits
 *   **Slobos (Discord: sloboscc)** — Original creator & idea. (The GOAT 🐐)
 *   **Mr.Juice (Discord: Mr.Juice3046)** — Updates, Guide, & Maintenance.
