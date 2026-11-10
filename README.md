@@ -41,6 +41,11 @@ This project is not affiliated with Aternos, Mojang, or Microsoft. Use at your o
 
 ---
 
+## 🎮 Saltline multiplayer
+The `saltline/` folder is a separate project: online co-op rooms for the *Saltline — 100 Contracts* browser game. See [saltline/README.md](saltline/README.md).
+
+---
+
 ## ❤️ Credits
 *   **Slobos (Discord: sloboscc)** — Original creator & idea. (The GOAT 🐐)
 *   **Mr.Juice (Discord: Mr.Juice3046)** — Updates, Guide, & Maintenance.
